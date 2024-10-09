@@ -1,6 +1,6 @@
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:./dev.db?timeout=60000"
 }
 
 generator client {
@@ -8,7 +8,88 @@ generator client {
 }
 
 model User {
+  id           Int          @id @default(autoincrement())
+  username     String       @unique
+  nickname     String
+  passwordHash String
+  role         String 
+  lvl          Int          @default(1)
+  experience   Int          @default(0)
+  coins        Int          @default(0)
+  avatarId     Int?
+  cards        Card[]       @relation("CardCreator")
+  likes        CardLike[]
+  avatars      UserAvatar[]
+  avatar       Avatars?     @relation(fields: [avatarId], references: [id]) // Relação com o avatar selecionado
+  userReward   UserReward[]
+}
+
+model Avatars {
+  id                 Int          @id @default(autoincrement())
+  name               String
+  path               String
+  itemValue          Int?
+  users              UserAvatar[]
+  selectedBy         User[]
+  reward             Rewards[]
+}
+
+model UserAvatar {
+  id       Int     @id @default(autoincrement())
+  userId   Int
+  avatarId Int
+  user     User    @relation(fields: [userId], references: [id])
+  avatar   Avatars @relation(fields: [avatarId], references: [id])
+
+  @@unique([userId, avatarId])
+}
+
+model Rewards {
+  id          Int          @id @default(autoincrement())
+  title       String
+  value       Int?
+  lvlRequired Int?         @default(0)
+  avatarId    Int?
+  avatar      Avatars?     @relation(fields: [avatarId], references: [id])
+  createdAt   DateTime     @default(now())
+  userReward  UserReward[]
+}
+
+model UserReward {
+  id       Int     @id @default(autoincrement())
+  userId   Int
+  rewardId Int
+  user     User    @relation(fields: [userId], references: [id])
+  reward   Rewards @relation(fields: [rewardId], references: [id])
+
+  @@unique([userId, rewardId])
+}
+
+model Board {
   id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
+  title     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  cards     Card[]
+}
+
+model Card {
+  id          Int        @id @default(autoincrement())
+  description String
+  createdAt   DateTime   @default(now())
+  board       Board      @relation(fields: [boardId], references: [id])
+  boardId     Int
+  columnId    Int
+  creator     User       @relation("CardCreator", fields: [creatorId], references: [id])
+  creatorId   Int
+  likes       CardLike[]
+}
+
+model CardLike {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  card      Card     @relation(fields: [cardId], references: [id])
+  cardId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
 }
