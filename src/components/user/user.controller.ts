@@ -22,11 +22,18 @@ export class UserController {
     return await this.userService.update(user, body);
   }
 
+  // @Get()
+  // @UseFilters(new HttpExceptionFilter())
+  // @UseGuards(JwtAuthGuard)
+  // async findAll() {
+  //   return this.userService.findAll();
+  // }
+
   @Get()
   @UseFilters(new HttpExceptionFilter())
   @UseGuards(JwtAuthGuard)
-  async findAll() {
-    return this.userService.findAll();
+  async findById(@User() user: any) {
+    return this.userService.findOneById(user.id);
   }
 
   @Delete(':id')

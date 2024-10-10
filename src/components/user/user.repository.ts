@@ -19,10 +19,17 @@ export class UserRepository {
         });
     }
 
+    async updateBoardRewards(userId, data){
+        return this.prisma.user.update({
+            where: { id: userId },
+            data
+        });
+    }
+
     async findOneById(id: number) {
         return this.prisma.user.findUnique({
             where: { id },
-            include: { userReward: true }
+            include: { userReward: true, avatar: true }
         });
     }
 
@@ -113,6 +120,13 @@ export class UserRepository {
         return this.prisma.user.update({
             where: { id: userId },
             data: { coins }
+        });
+    }
+
+    async updateUser(userId, data) {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data
         });
     }
 

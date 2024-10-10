@@ -40,6 +40,10 @@ export class UserService {
     }
   }
 
+  async updateBoardRewards(userId: number, data: any) {
+    return this.userRepository.updateBoardRewards(userId, data);
+  }
+
   async findOneById(id: number) {
     return this.userRepository.findOneById(id);
   }
@@ -101,12 +105,17 @@ export class UserService {
       throw new Error('Usuário não possui nível suficiente.');
     }
 
-    const rewardRendeed = await this.userRepository.rendeenReward(user.id, reward.id);
+    await this.userRepository.rendeenReward(user.id, reward.id);
 
-    if (!rewardRendeed) {
-      throw new Error('Erro ao resgatar recompensa.');
+    if (reward.value) {
+      await this.userRepository.updateUserCoins(user.id, user.coins + reward.value);
+    } else {
+      await this.userRepository.purchaseAvatars(user.id, [reward.avatarId]);
     }
 
-    return await this.userRepository.getRewardById(body.rewardId, user.id);
+    return {
+      user: (await this.userRepository.findOneById(userToken.id)),
+      reward: (await this.userRepository.getRewardById(body.rewardId, user.id))
+    };
   }
 }

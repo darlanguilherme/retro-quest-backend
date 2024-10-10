@@ -40,4 +40,11 @@ export class BoardController {
   async delete(@Param('id') id: number) {
     return this.boardService.delete(id);
   }
+
+  @Post('/finish')
+  // @UseFilters(new HttpExceptionFilter())
+  async finish(@Body() body) {
+    return await this.boardService.finish(body.retroId);
+  }
+  
 }

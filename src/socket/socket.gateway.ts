@@ -44,6 +44,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('Card emitted to board:', card);
   }
 
+  @SubscribeMessage('finishBoard')
+  async handleFinishBoard(client: Socket, boardId: any) {
+    const finished = await this.boardService.finish(boardId);
+    this.server.to(`board_${boardId}`).emit('boardFinished', finished);
+    console.log('Card emitted to board:', finished);
+  }
+
   @SubscribeMessage('likeCard')
   async handleLikeCard(client: Socket, data: { cardId: number; userId: number }) {
     const card = await this.cardService.likeCard(data.cardId, data.userId);

@@ -12,6 +12,13 @@ export class BoardRepository {
         });
     }
 
+    async update(id: number, data: any) {
+        return await this.prisma.board.update({
+            where: { id },
+            data,
+        });
+    }
+
     async findOneById(id: number) {
         return this.prisma.board.findUnique({
             where: { id },
@@ -33,7 +40,10 @@ export class BoardRepository {
             where: { id },
             include: {
                 cards: {
-                    include: { likes: true },
+                    include: {
+                        likes: true,
+                        creator: true
+                    },
                 }
             },
         });
