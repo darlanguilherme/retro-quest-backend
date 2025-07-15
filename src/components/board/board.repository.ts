@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { Board } from '@prisma/client';
+import { Board, BoardMvp } from '@prisma/client';
 
 @Injectable()
 export class BoardRepository {
@@ -44,7 +44,8 @@ export class BoardRepository {
                         likes: true,
                         creator: true
                     },
-                }
+                },
+                mvps:{},
             },
         });
     }
@@ -52,6 +53,12 @@ export class BoardRepository {
     async delete(id: number) {
         return this.prisma.board.delete({
             where: { id },
+        });
+    }
+
+    async voteMvp(data: any): Promise<BoardMvp> {
+        return await this.prisma.boardMvp.create({
+            data,
         });
     }
 }

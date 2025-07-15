@@ -19,7 +19,7 @@ export class UserRepository {
         });
     }
 
-    async updateBoardRewards(userId, data){
+    async updateBoardRewards(userId, data) {
         return this.prisma.user.update({
             where: { id: userId },
             data
@@ -41,7 +41,7 @@ export class UserRepository {
     }
 
     async findAll() {
-        return this.prisma.user.findMany();
+        return this.prisma.user.findMany({ include: { avatar: true }, });
     }
 
     async delete(id: number) {

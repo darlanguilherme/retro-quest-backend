@@ -81,8 +81,37 @@ export class BoardService {
       await this.userService.updateBoardRewards(score.creator.id, dataToUpdate);
     })
 
-    await this.boardRepository.update(boardId, { isActive: false });
+    const voteCount: Record<number, number> = {};
+
+    let mvpSelected = [];
+
+    if (board?.mvps) {
+      // Contar os votos por userWasVoted
+      board?.mvps?.forEach((mvp) => {
+        voteCount[mvp.userWasVoted] = (voteCount[mvp.userWasVoted] || 0) + 1;
+      });
+
+      // Descobrir o maior número de votos
+      const maxVotes = Math.max(...Object.values(voteCount));
+
+      // Pegar todos os userWasVoted com esse número de votos
+      mvpSelected = Object.entries(voteCount)
+        .filter(([_, count]) => count === maxVotes)
+        .map(([userId]) => Number(userId));
+
+      console.log(mvpSelected);
+    }
+
+    await this.boardRepository.update(boardId, { isActive: false, mvpSelected: JSON.stringify(mvpSelected) });
 
     return true;
+  }
+
+  async voteMvp(data) {
+    try {
+      return await this.boardRepository.voteMvp(data);
+    } catch (error) {
+      throw new Error('Erro ao setar mvp: ' + error.message);
+    }
   }
 }

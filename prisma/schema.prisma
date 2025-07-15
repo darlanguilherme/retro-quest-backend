@@ -66,11 +66,13 @@ model UserReward {
 }
 
 model Board {
-  id        Int      @id @default(autoincrement())
-  title     String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  cards     Card[]
+  id          Int      @id @default(autoincrement())
+  title       String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  cards       Card[]
+  mvpSelected String?
+  mvps        BoardMvp[]
 }
 
 model Card {
@@ -81,7 +83,7 @@ model Card {
   boardId     Int
   columnId    Int
   creator     User       @relation("CardCreator", fields: [creatorId], references: [id])
-  creatorId   Int
+  creatorId   Int        @default(0)
   likes       CardLike[]
 }
 
@@ -92,4 +94,18 @@ model CardLike {
   cardId    Int
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
+}
+
+model BoardMvp {
+  id            Int        @id @default(autoincrement())
+  board         Board      @relation(fields: [boardId], references: [id])
+  boardId       Int
+  userVoted     Int
+  userWasVoted  Int
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD/diagram.svg"
+  theme    = "neutral"
 }

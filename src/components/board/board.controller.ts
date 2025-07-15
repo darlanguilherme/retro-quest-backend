@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Param, Delete, UseGuards,  ValidationPipe, UsePipes, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete, UseGuards, ValidationPipe, UsePipes, UseFilters } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/guard/jwt.guard';
 import { HttpExceptionFilter } from 'src/filters/http.exception.filter';
+import { User } from 'src/decorator/user.decorator';
 
 
 @Controller('boards')
@@ -46,5 +47,11 @@ export class BoardController {
   async finish(@Body() body) {
     return await this.boardService.finish(body.retroId);
   }
-  
+
+  @Post('/voteMvp')
+  @UseFilters(new HttpExceptionFilter())
+  async setMvp(@User() user: any, @Body() body) {
+    return await this.boardService.voteMvp({ ...body, userVoted: user.id });
+  }
+
 }
